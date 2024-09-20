@@ -14,5 +14,10 @@ func main() {
 			"message": "Skill Map openig",
 		})
 	})
+	r.GET("/login", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{
+			"message": "logine Reqred",
+		})
+	})
 	r.Run()
 }
