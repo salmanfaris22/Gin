@@ -1,18 +1,11 @@
 package main
 
-import (
-	"github.com/gin-gonic/gin"
-	"github.come/salmanfaris22/Skill-map/handler"
-)
-
 func main() {
-	// fmt.Println("salman$ go get -u github.com/gin-gonic/gin")
 
-	r := gin.Default()
-
-	handler.UserAPI(r)
-
-	r.Run()
+	// r := gin.Default()
+	// userManeger := manegers.NewUSerManager()
+	// userHadler := handlers.NewUserHandler()
+	// r.Run()
 }
 
 // func getData(ctx *gin.Context) {
