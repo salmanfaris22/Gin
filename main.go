@@ -24,7 +24,7 @@ func creatPost(ctx *gin.Context) {
 	var newPost Post
 	err := ctx.BindJSON(&newPost)
 	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.h{"message": "Enter Valid"})
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Enter Valid"})
 		return
 	}
 	posts = append(posts, newPost)
@@ -44,13 +44,13 @@ func updatePost(ctx *gin.Context) {
 	id := ctx.Param("id")
 	item, err := postById(id)
 	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, "posts not font")
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Post Not Font"})
 		return
 	}
 	var newPost Post
 	er := ctx.BindJSON(&newPost)
 	if er != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, "enter Valid Input")
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Enter Valid Input"})
 		return
 	}
 
@@ -59,12 +59,43 @@ func updatePost(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, item)
 }
 
+func deletePost(ctx *gin.Context) {
+	id := ctx.Param("id")
+	_, err := postById(id)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Post Not Font"})
+		return
+	}
+
+	for index, val := range posts {
+		if val.ID == id {
+			posts = append(posts[:index], posts[index+1:]...)
+			break
+		}
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{"message": "post deleted"})
+
+}
+
+func getPostByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+	item, err := postById(id)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Post Not Font"})
+		return
+	}
+	ctx.JSON(http.StatusOK, item)
+
+}
 func main() {
 	server := gin.Default()
 
 	server.GET("/posts", getPost)
 	server.POST("/post", creatPost)
 	server.PATCH("/post/:id", updatePost)
+	server.DELETE("/post/:id", deletePost)
+	server.GET("/post/:id", getPostByID)
 
 	server.Run()
 }
