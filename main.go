@@ -21,14 +21,24 @@ func getPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, posts)
 }
 func creatPost(ctx *gin.Context) {
+
 	var newPost Post
 	err := ctx.BindJSON(&newPost)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Enter Valid"})
 		return
 	}
-	posts = append(posts, newPost)
-	ctx.IndentedJSON(http.StatusCreated, newPost)
+	id := newPost.ID
+	item, err := postById(id)
+	if item != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "This ID Alredy Used"})
+		return
+	}
+	if err != nil {
+		posts = append(posts, newPost)
+		ctx.IndentedJSON(http.StatusCreated, newPost)
+	}
+
 }
 
 func postById(id string) (*Post, error) {
