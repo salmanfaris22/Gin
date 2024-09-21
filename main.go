@@ -8,16 +8,19 @@ import (
 
 var (
 	videoService    service.VideoService       = service.New()
-	vedioController controller.VedioController = controller.New(videoService)
+	videoController controller.VideoController = controller.New(videoService) // Fixed naming
 )
 
 func main() {
 	server := gin.Default()
+
 	server.GET("/videos", func(ctx *gin.Context) {
-		ctx.JSON(200, vedioController.FindAll())
+		ctx.JSON(200, videoController.FindAll())
 	})
+
 	server.POST("/videos", func(ctx *gin.Context) {
-		ctx.JSON(200, vedioController.Save(ctx))
+		videoController.Save(ctx) // The Save method handles the response
 	})
+
 	server.Run()
 }

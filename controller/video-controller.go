@@ -6,7 +6,7 @@ import (
 	"github.come/salmanfaris22/Skill-map/service"
 )
 
-type VedioController interface {
+type VideoController interface {
 	FindAll() []entity.Video
 	Save(ctx *gin.Context) entity.Video
 }
@@ -15,20 +15,23 @@ type controller struct {
 	service service.VideoService
 }
 
-func New(service service.VideoService) VedioController {
-	return &controller{ // Use pointer here
+func New(service service.VideoService) VideoController {
+	return &controller{
 		service: service,
 	}
 }
 
 func (c *controller) Save(ctx *gin.Context) entity.Video {
-	var vdeo entity.Video
-	ctx.BindJSON(&vdeo)
-	c.service.Save(vdeo)
-	return vdeo
-
+	var video entity.Video
+	if err := ctx.BindJSON(&video); err != nil {
+		ctx.JSON(400, gin.H{"error": "Bad Request"})
+		return entity.Video{} // Return an empty video on error
+	}
+	savedVideo := c.service.Save(video)
+	ctx.JSON(201, savedVideo) // Return the saved video with 201 status
+	return savedVideo
 }
-func (controller *controller) FindAll() []entity.Video {
-	return controller.FindAll()
 
+func (c *controller) FindAll() []entity.Video {
+	return c.service.FindAll() // Call the service's FindAll method
 }
