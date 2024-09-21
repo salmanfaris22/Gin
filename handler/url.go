@@ -9,11 +9,11 @@ import (
 func UserAPI(r *gin.Engine) {
 	userGrup := r.Group("/user")
 
-	userGrup.GET("")
-	userGrup.POST("", func(ctx *gin.Context) {
+	userGrup.GET("", listuser)
+	userGrup.POST("", creatuser)
+	userGrup.PATCH("", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "This Open OK",
 		})
 	})
-	userGrup.PATCH("", listuser)
 }
