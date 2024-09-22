@@ -3,7 +3,10 @@ package main
 import (
 	"errors"
 	"net/http"
+	"strconv"
+	"sync"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,9 +16,14 @@ type Post struct {
 	Desc  string `json:"desc"`
 }
 
-var posts = []Post{
-	{ID: "1", Title: "jasim muhammed", Desc: "is Aloso A Boy"},
-}
+var (
+	posts = []Post{
+		{ID: "1", Title: "jasim muhammed", Desc: "is Aloso A Boy"},
+	}
+
+	lastId = 1
+	mu     sync.Mutex
+)
 
 func getPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, posts)
@@ -28,16 +36,13 @@ func creatPost(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Enter Valid"})
 		return
 	}
-	id := newPost.ID
-	item, err := postById(id)
-	if item != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "This ID Alredy Used"})
-		return
-	}
-	if err != nil {
-		posts = append(posts, newPost)
-		ctx.IndentedJSON(http.StatusCreated, newPost)
-	}
+
+	mu.Lock()
+	lastId++
+	newPost.ID = strconv.Itoa(lastId)
+	mu.Unlock()
+	posts = append(posts, newPost)
+	ctx.IndentedJSON(http.StatusCreated, newPost)
 
 }
 
@@ -100,6 +105,14 @@ func getPostByID(ctx *gin.Context) {
 }
 func main() {
 	server := gin.Default()
+
+	server.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // Allow your frontend URL
+		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	server.GET("/posts", getPost)
 	server.POST("/post", creatPost)
